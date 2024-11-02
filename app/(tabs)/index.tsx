@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text,  TextInput, StyleSheet } from 'react-native';
+
 import { FlashList } from "@shopify/flash-list";
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import {Search} from 'lucide-react-native'
-import { EventService } from '@/services/event/api';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { debounce } from 'lodash';
+
 import EventCard from '@/components/EventCard';
 import baseStyle from '@/constants/baseStyle';
-import { debounce } from 'lodash';
+
+import { EventService } from '@/services/event/api';
+
 
 export default function AppMainScreen() {
   const [events, setEvents] = useState<API.Pagination<API.Event>>();

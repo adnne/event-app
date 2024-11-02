@@ -9,7 +9,6 @@ const baseStyles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 8,
-        margin: 16,
         paddingHorizontal: 12,
     },
     baseContainer: {

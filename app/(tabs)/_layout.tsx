@@ -1,6 +1,16 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { Home, CirclePlus, Settings } from 'lucide-react-native';
+import { useState } from 'react';
 export default function TabLayout() {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return (
+      <Redirect href="/(auth)/login" />
+    )
+    }
+    
   return (
     <Tabs screenOptions={{
       headerShown: false,
