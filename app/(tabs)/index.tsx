@@ -62,12 +62,13 @@ export default function AppMainScreen() {
 
   return (
     <SafeAreaView style={baseStyle.baseContainer}>
-      <View style={baseStyle.baseInput}>
+      <View style={[baseStyle.baseInput,{marginHorizontal: 16}]}>
         <Search color={'#4B5563'} height={20} width={20} style={{
           marginRight: 8
         }} />
         <TextInput
           placeholder="Search events..."
+          style={{width:'100%'}}
           onChangeText={onSearch}
         />
       </View>

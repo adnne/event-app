@@ -1,15 +1,36 @@
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, router, Tabs } from 'expo-router';
 import { Home, CirclePlus, Settings } from 'lucide-react-native';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
+import * as SecureStore from 'expo-secure-store';
+import { ActivityIndicator } from 'react-native';
+import { AuthService } from '@/services/auth/api';
+import { useDispatch } from 'react-redux';
+import { login } from '@/redux/authSlice';
+
 export default function TabLayout() {
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      AuthService.getUser().then((res) => {
+        setLoading(false)
+        dispatch(login(res.data.user))
+        
+      }).catch(() => {
+        router.replace('/(auth)/login');
+      })
+    }, [])
+  );
 
-  if (!isAuthenticated) {
+  if (loading) {
     return (
-      <Redirect href="/(auth)/login" />
+      <ActivityIndicator />
     )
-    }
+  }
+  
     
   return (
     <Tabs screenOptions={{
@@ -60,6 +81,13 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+      name="details/[id]"
+      options={{
+        href:null
+      }}
+      />
+
     </Tabs>
   );
 }

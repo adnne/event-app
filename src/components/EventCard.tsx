@@ -1,10 +1,11 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import {MapPin,Clock4,Calendar,User} from 'lucide-react-native'
 import noImage from "@/assets/images/events/noImage.png"
+import { router } from 'expo-router';
 
 
 const EventCard = (props: {event:API.Event}) => {
-    const {  title, date_time, location,guest_limit, image} = props.event
+    const { id, title, date_time, location,guest_limit, image} = props.event
     const dateObj = new Date(date_time)
 
     const date = dateObj.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' }); 
@@ -12,7 +13,7 @@ const EventCard = (props: {event:API.Event}) => {
 
     
     return (
-        <TouchableOpacity style={styles.eventCard}>
+        <TouchableOpacity style={styles.eventCard} onPress={()=>router.push(`/details/${id}`)} >
         <Image
           source={image?{uri:image}:noImage}
           style={styles.eventImage}

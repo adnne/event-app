@@ -4,24 +4,39 @@ import Logo from '@/assets/logos/Logo.svg';
 import baseStyle from '@/constants/baseStyle';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller, FieldValues } from 'react-hook-form';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
+import { AuthService } from '@/services/auth/api';
+import Toast from 'react-native-toast-message';
 
 const RegisterPage = () => {
   const { control, handleSubmit, formState: { errors }, watch } = useForm({
     defaultValues: {
-      username: '',
       email: '',
-      password: '',
-      confirmPassword: '',
+      password1: '',
+      password2: '',
     }
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
-    // Here you would typically send the data to your API for registration
+  const onSubmit = (data:API.RegisterForm) => {
+
+    AuthService.register(data).then((res) => {
+      router.replace('/(auth)/login');
+      Toast.show({
+        type: 'success',
+        text1: 'Account created succesfully '
+      });
+  
+    }).catch(() => {
+      Toast.show({
+        type: 'error',
+        text1: 'Something went wrong',
+      });
+  
+    })
+    
   };
 
-  const password = watch('password');
+  const password1 = watch('password1');
 
   return (
     <SafeAreaView style={baseStyle.baseContainer}>
@@ -31,25 +46,6 @@ const RegisterPage = () => {
       <View style={styles.content}>
         <Text style={styles.headerTitle}>Register</Text>
 
-        {/* Username Field */}
-        <Controller
-          control={control}
-          rules={{ required: 'Username is required' }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={baseStyle.baseInput}>
-              <TextInput
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="Username"
-              />
-            </View>
-          )}
-          name="username"
-        />
-        {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
-
-        {/* Email Field */}
         <Controller
           control={control}
           rules={{
@@ -74,31 +70,29 @@ const RegisterPage = () => {
         />
         {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
 
-        {/* Password Field */}
         <Controller
           control={control}
-          rules={{ required: 'Password is required' }}
+          rules={{ required: 'Password1 is required' }}
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={baseStyle.baseInput}>
               <TextInput
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                placeholder="Password"
+                placeholder="Password1"
                 secureTextEntry
               />
             </View>
           )}
-          name="password"
+          name="password1"
         />
-        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+        {errors.password1 && <Text style={styles.errorText}>{errors.password1.message}</Text>}
 
-        {/* Confirm Password Field */}
         <Controller
           control={control}
           rules={{
-            required: 'Confirm password is required',
-            validate: value => value === password || 'Passwords do not match',
+            required: 'Confirm password1 is required',
+            validate: value => value === password1 || 'Password1s do not match',
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={baseStyle.baseInput}>
@@ -106,14 +100,14 @@ const RegisterPage = () => {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                placeholder="Confirm Password"
+                placeholder="Confirm Password1"
                 secureTextEntry
               />
             </View>
           )}
-          name="confirmPassword"
+          name="password2"
         />
-        {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>}
+        {errors.password2 && <Text style={styles.errorText}>{errors.password2.message}</Text>}
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
           <Text style={styles.buttonText}>Register</Text>

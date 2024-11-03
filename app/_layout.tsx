@@ -12,6 +12,10 @@ import {
   Inter_900Black,
 } from '@expo-google-fonts/inter';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
+import { store } from "@/redux/store";
+import { Provider } from 'react-redux';
+import Toast from 'react-native-toast-message';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 export default function RootLayout() {
@@ -35,10 +39,19 @@ export default function RootLayout() {
     );
   }
   return (
-    <Stack>
-      <Stack.Screen  name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen  name="(auth)" options={{ headerShown: false }} />
-    </Stack>
+    <GestureHandlerRootView >
+
+
+    <Provider store={store}>
+      <Toast />
+      <Stack>
+        <Stack.Screen  name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen  name="(auth)" options={{ headerShown: false }} />
+      </Stack>
+    </Provider>
+    </GestureHandlerRootView>
+
+  
   );
 }
 

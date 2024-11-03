@@ -3,14 +3,14 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const axiosInterceptor = axios.create({
-  baseURL: 'http://192.168.1.3:8000/api',
+  baseURL: 'http://192.168.1.21:8000/api',
   
 });
 
 axiosInterceptor.interceptors.request.use(
-  async (config) => {
+   (config) => {
     const conf = config;
-    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const accessToken =  SecureStore.getItem('accessToken');
     if (accessToken) {
       if (config.headers) conf.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -27,17 +27,17 @@ axiosInterceptor.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error) => {
+   async (error) => {
     console.log(error.response.data);
     const originalRequest = error.config;
     if (
       error.response?.status === 401 &&
-      originalRequest.url === '/token/refresh/'
+      originalRequest.url === '/auth/token/refresh/'
     ) {
       return Promise.reject(error);
     }
     if (typeof SecureStore !== 'undefined') {
-      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      const refreshToken = SecureStore.getItem('refreshToken');
       if (refreshToken) {
         const data = {
           refresh: refreshToken,
@@ -46,19 +46,24 @@ axiosInterceptor.interceptors.response.use(
           originalRequest._retry = true;
 
           return axiosInterceptor
-            .post('/token/refresh/', data)
-            .then(async (res) => {
-              SecureStore.setItemAsync('accessToken', res.data.access);
+            .post('/auth/token/refresh/', data)
+            .then( (res) => {
+              SecureStore.setItem('accessToken', res.data.access);
               const err = error;
               err.response.config.headers.Authorization = `Bearer ${res.data.access}`;
 
               return axiosInterceptor(err.response.config);
             })
-            .catch(async (err) => {
-              // Destroy all tokens.
+            .catch( (err) => {
+              console.log(err);
+              
               if (err.response?.status === 401) {
-                await SecureStore.deleteItemAsync('accessToken');
-                await SecureStore.deleteItemAsync('refreshToken');
+                 SecureStore.deleteItemAsync('accessToken').then(() => {
+                   console.log('access destroyed');
+                 })
+                 SecureStore.deleteItemAsync('refreshToken').then(() => {
+                   console.log('refresh destroyed');
+                 })
               }
               return Promise.reject(err);
             });

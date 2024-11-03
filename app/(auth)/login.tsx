@@ -1,11 +1,15 @@
 import React from 'react'
 import { View, Text,  TextInput, StyleSheet ,TouchableOpacity} from 'react-native';
 import { Link } from 'expo-router';
-
+import * as SecureStore from 'expo-secure-store';
 import Logo from '@/assets/logos/Logo.svg'
 import baseStyle from '@/constants/baseStyle';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller,FieldValues } from 'react-hook-form';
+import { AuthService } from '@/services/auth/api';
+import { useDispatch } from 'react-redux';
+import { login } from '@/redux/authSlice';
+import { useRouter } from 'expo-router';
 
 const LoginPage = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -14,9 +18,19 @@ const LoginPage = () => {
       password: '',
     }
   });
+  const router = useRouter();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const dispatch = useDispatch();
+
+  const onSubmit = (data:API.LoginForm) => {
+    AuthService.login(data).then((res) => {
+      dispatch(login(res.data.user));
+      SecureStore.setItem('accessToken', res.data.access);
+      SecureStore.setItem('refreshToken', res.data.refresh);
+      router.replace('/(tabs)/');
+    }).catch((err) => {
+      console.log(err)
+    })
   };
   return (
    
@@ -38,8 +52,8 @@ const LoginPage = () => {
     }}
     render={({ field: { onChange, onBlur, value } }) => (
       <View style={baseStyle.baseInput}>
-        {/* <Ionicons name="mail-outline" size={24} color="#52B788" style={styles.icon} /> */}
         <TextInput
+          style={{width:'100%'}}
           onBlur={onBlur}
           onChangeText={onChange}
           value={value}
@@ -59,8 +73,8 @@ const LoginPage = () => {
     }}
     render={({ field: { onChange, onBlur, value } }) => (
       <View style={baseStyle.baseInput}>
-        {/* <Ionicons name="lock-closed-outline" size={24} color="#52B788" style={styles.icon} /> */}
         <TextInput
+          style={{width:'100%'}}
           onBlur={onBlur}
           onChangeText={onChange}
           value={value}
